@@ -4,6 +4,7 @@ FROM judge0/buildpack-deps:buster-2019-12-28
 
 # Check for latest version here: https://gcc.gnu.org/releases.html, https://ftpmirror.gnu.org/gcc
 ENV GCC_VERSIONS \
+      7.2.0 \
       7.4.0 \
       8.3.0 \
       9.2.0
@@ -34,7 +35,11 @@ RUN set -xe && \
 
 # Check for latest version here: https://www.ruby-lang.org/en/downloads
 ENV RUBY_VERSIONS \
-      2.7.0
+      2.7.0 \
+      2.4.0 \
+      2.3.3 \
+      2.2.6 \
+      2.1.9
 RUN set -xe && \
     for VERSION in $RUBY_VERSIONS; do \
       curl -fSsL "https://cache.ruby-lang.org/pub/ruby/${VERSION%.*}/ruby-$VERSION.tar.gz" -o /tmp/ruby-$VERSION.tar.gz && \
@@ -53,7 +58,9 @@ RUN set -xe && \
 # Check for latest version here: https://www.python.org/downloads
 ENV PYTHON_VERSIONS \
       3.8.1 \
-      2.7.17
+      3.6.0 \
+      2.7.17 \
+      2.7.9
 RUN set -xe && \
     for VERSION in $PYTHON_VERSIONS; do \
       curl -fSsL "https://www.python.org/ftp/python/$VERSION/Python-$VERSION.tar.xz" -o /tmp/python-$VERSION.tar.xz && \
@@ -70,7 +77,8 @@ RUN set -xe && \
 
 # Check for latest version here: https://ftp.gnu.org/gnu/octave
 ENV OCTAVE_VERSIONS \
-      5.1.0
+      5.1.0 \
+      4.2.0
 RUN set -xe && \
     apt-get update && \
     apt-get install -y --no-install-recommends gfortran libblas-dev liblapack-dev libpcre3-dev && \
@@ -88,6 +96,19 @@ RUN set -xe && \
       rm -rf /tmp/*; \
     done
 
+# see https://bugs.debian.org/775775
+# and https://github.com/docker-library/java/issues/19#issuecomment-70546872
+RUN set -xe && \
+    JAVA_8_DEBIAN_VERSION=8u131-b11-1~bpo8+1 && \
+    JAVA_7_DEBIAN_VERSION=7u151-2.6.11-1~deb8u1 && \
+    CA_CERTIFICATES_JAVA_VERSION=20161107~bpo8+1 && \
+    echo 'deb http://deb.debian.org/debian jessie-backports main' > /etc/apt/sources.list.d/jessie-backports.list && \
+    apt-get update && apt-get install -y \
+      openjdk-8-jdk="$JAVA_8_DEBIAN_VERSION" \
+      openjdk-7-jdk="$JAVA_7_DEBIAN_VERSION" \
+      ca-certificates-java="$CA_CERTIFICATES_JAVA_VERSION" && \
+    update-alternatives --set java /usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java && \
+    update-alternatives --set javac /usr/lib/jvm/java-8-openjdk-amd64/bin/javac
 # Check for latest version here: https://jdk.java.net
 RUN set -xe && \
     curl -fSsL "https://download.java.net/java/GA/jdk13.0.1/cec27d702aa74d5a8630c65ae61e4305/9/GPL/openjdk-13.0.1_linux-x64_bin.tar.gz" -o /tmp/openjdk13.tar.gz && \
@@ -100,7 +121,9 @@ RUN set -xe && \
 
 # Check for latest version here: https://ftpmirror.gnu.org/bash
 ENV BASH_VERSIONS \
-      5.0
+      5.0 \
+      4.4 \
+      4.0
 RUN set -xe && \
     for VERSION in $BASH_VERSIONS; do \
       curl -fSsL "https://ftpmirror.gnu.org/bash/bash-$VERSION.tar.gz" -o /tmp/bash-$VERSION.tar.gz && \
@@ -117,7 +140,8 @@ RUN set -xe && \
 
 # Check for latest version here: https://www.freepascal.org/download.html
 ENV FPC_VERSIONS \
-      3.0.4
+      3.0.4 \
+      3.0.0
 RUN set -xe && \
     for VERSION in $FPC_VERSIONS; do \
       curl -fSsL "ftp://ftp.freepascal.org/fpc/dist/$VERSION/x86_64-linux/fpc-$VERSION.x86_64-linux.tar" -o /tmp/fpc-$VERSION.tar && \
@@ -131,7 +155,8 @@ RUN set -xe && \
 
 # Check for latest version here: https://www.haskell.org/ghc/download.html
 ENV HASKELL_VERSIONS \
-      8.8.1
+      8.8.1 \
+      8.2.1
 RUN set -xe && \
     apt-get update && \
     apt-get install -y --no-install-recommends libgmp-dev libtinfo5 && \
@@ -150,7 +175,9 @@ RUN set -xe && \
 
 # Check for latest version here: https://www.mono-project.com/download/stable
 ENV MONO_VERSIONS \
-      6.6.0.161
+      6.6.0.161 \
+      5.4.0.167 \
+      5.2.0.224
 RUN set -xe && \
     apt-get update && \
     apt-get install -y --no-install-recommends cmake && \
@@ -170,7 +197,8 @@ RUN set -xe && \
 
 # Check for latest version here: https://nodejs.org/en
 ENV NODE_VERSIONS \
-      12.14.0
+      12.14.0 \
+      8.5.0
 RUN set -xe && \
     for VERSION in $NODE_VERSIONS; do \
       curl -fSsL "https://nodejs.org/dist/v$VERSION/node-v$VERSION.tar.gz" -o /tmp/node-$VERSION.tar.gz && \
@@ -187,7 +215,8 @@ RUN set -xe && \
 
 # Check for latest version here: https://github.com/erlang/otp/releases
 ENV ERLANG_VERSIONS \
-      22.2
+      22.2 \
+      20.0
 RUN set -xe && \
     apt-get update && \
     apt-get install -y --no-install-recommends unzip && \
@@ -209,7 +238,8 @@ RUN set -xe && \
 
 # Check for latest version here: https://github.com/elixir-lang/elixir/releases
 ENV ELIXIR_VERSIONS \
-      1.9.4
+      1.9.4 \
+      1.5.1
 RUN set -xe && \
     apt-get update && \
     apt-get install -y --no-install-recommends unzip && \
@@ -222,7 +252,8 @@ RUN set -xe && \
 
 # Check for latest version here: https://www.rust-lang.org
 ENV RUST_VERSIONS \
-      1.40.0
+      1.40.0 \
+      1.20.0
 RUN set -xe && \
     for VERSION in $RUST_VERSIONS; do \
       curl -fSsL "https://static.rust-lang.org/dist/rust-$VERSION-x86_64-unknown-linux-gnu.tar.gz" -o /tmp/rust-$VERSION.tar.gz && \
@@ -238,7 +269,8 @@ RUN set -xe && \
 
 # Check for latest version here: https://golang.org/dl
 ENV GO_VERSIONS \
-      1.13.5
+      1.13.5 \
+      1.9
 RUN set -xe && \
     for VERSION in $GO_VERSIONS; do \
       curl -fSsL "https://storage.googleapis.com/golang/go$VERSION.linux-amd64.tar.gz" -o /tmp/go-$VERSION.tar.gz && \
@@ -249,10 +281,11 @@ RUN set -xe && \
 
 # Check for latest version here: https://sourceforge.net/projects/fbc/files/Binaries%20-%20Linux
 ENV FBC_VERSIONS \
-      1.07.1
+      1.07.1 \
+      1.05.0
 RUN set -xe && \
     for VERSION in $FBC_VERSIONS; do \
-      curl -fSsL "https://downloads.sourceforge.net/project/fbc/Older%20versions/$VERSION/FreeBASIC-$VERSION-linux-x86_64.tar.gz" -o /tmp/fbc-$VERSION.tar.gz && \
+      curl -fSsL "https://downloads.sourceforge.net/project/fbc/Binaries%20-%20Linux/FreeBASIC-$VERSION-linux-x86_64.tar.gz" -o /tmp/fbc-$VERSION.tar.gz && \
       mkdir /usr/local/fbc-$VERSION && \
       tar -xf /tmp/fbc-$VERSION.tar.gz -C /usr/local/fbc-$VERSION --strip-components=1 && \
       rm -rf /tmp/*; \
@@ -260,7 +293,8 @@ RUN set -xe && \
 
 # Check for latest version here: https://github.com/ocaml/ocaml/releases
 ENV OCAML_VERSIONS \
-      4.09.0
+      4.09.0 \
+      4.05.0
 RUN set -xe && \
     for VERSION in $OCAML_VERSIONS; do \
       curl -fSsL "https://github.com/ocaml/ocaml/archive/$VERSION.tar.gz" -o /tmp/ocaml-$VERSION.tar.gz && \
@@ -498,20 +532,37 @@ RUN set -xe && \
 
 # Support for Perl came "for free" since it is already installed.
 
+# ENV CLOJURE_VERSIONS \
+#       1.8.0
+# RUN set -xe && \
+#     apt-get update && apt-get install -y unzip && \
+#     for CLOJURE_VERSION in $CLOJURE_VERSIONS; do \
+#       curl -fSsL "https://repo1.maven.org/maven2/org/clojure/clojure/$CLOJURE_VERSION/clojure-$CLOJURE_VERSION.zip" -o /tmp/clojure-$CLOJURE_VERSION.zip; \
+#     done; \
+#     for CLOJURE_VERSION in $CLOJURE_VERSIONS; do \
+#       unzip -d /usr/local /tmp/clojure-$CLOJURE_VERSION.zip && \
+#       chmod -R 755 /usr/local/clojure-$CLOJURE_VERSION && \
+#       rm /tmp/clojure-$CLOJURE_VERSION.zip; \
+#     done
 # Check for latest version here: https://github.com/clojure/clojure/releases
-ENV CLOJURE_VERSION 1.10.1
+ENV CLOJURE_VERSIONS \
+    1.10.1 \
+    1.8.0
 RUN set -xe && \
-    apt-get update && \
-    apt-get install -y --no-install-recommends maven && \
-    cd /tmp && \
-    git clone https://github.com/clojure/clojure && \
-    cd clojure && \
-    git checkout clojure-$CLOJURE_VERSION && \
-    mvn -Plocal -Dmaven.test.skip=true package && \
-    mkdir /usr/local/clojure-$CLOJURE_VERSION && \
-    cp clojure.jar /usr/local/clojure-$CLOJURE_VERSION && \
-    apt-get remove --purge -y maven && \
-    rm -rf /var/lib/apt/lists/* /tmp/*
+    for VERSION in $CLOJURE_VERSIONS; do \
+      apt-get update && \
+      apt-get install -y --no-install-recommends maven && \
+      cd /tmp && \
+      git clone https://github.com/clojure/clojure && \
+      cd clojure && \
+      git checkout clojure-$CLOJURE_VERSION && \
+      mvn -Plocal -Dmaven.test.skip=true package && \
+      mkdir /usr/local/clojure-$CLOJURE_VERSION && \
+      cp clojure.jar /usr/local/clojure-$CLOJURE_VERSION && \
+      apt-get remove --purge -y maven && \
+      rm -rf /var/lib/apt/lists/* && \
+      rm -rf /tmp/*; \
+    done
 
 # Check for latest version here: https://github.com/dotnet/sdk/releases
 RUN set -xe && \
@@ -525,6 +576,47 @@ RUN set -xe && \
     curl -fSsL "https://dl.bintray.com/groovy/maven/apache-groovy-binary-3.0.3.zip" -o /tmp/groovy.zip && \
     unzip /tmp/groovy.zip -d /usr/local && \
     rm -rf /tmp/*
+
+ENV CRYSTAL_VERSIONS \
+      0.23.1-3
+RUN set -xe && \
+    for CRYSTAL_VERSION in $CRYSTAL_VERSIONS; do \
+      curl -fSsL "https://github.com/crystal-lang/crystal/releases/download/${CRYSTAL_VERSION%-*}/crystal-$CRYSTAL_VERSION-linux-x86_64.tar.gz" -o /tmp/crystal-$CRYSTAL_VERSION.tar.gz; \
+    done; \
+    for CRYSTAL_VERSION in $CRYSTAL_VERSIONS; do \
+      mkdir /usr/local/crystal-$CRYSTAL_VERSION && \
+      tar -xf /tmp/crystal-$CRYSTAL_VERSION.tar.gz -C /usr/local/crystal-$CRYSTAL_VERSION --strip-components=1 && \
+      rm /tmp/crystal-$CRYSTAL_VERSION.tar.gz; \
+    done
+
+ENV INSECT_VERSIONS \
+      5.0.0
+RUN set -xe && \
+    apt-get update && apt-get install -y nodejs-legacy npm && \
+    for INSECT_VERSION in $INSECT_VERSIONS; do \
+      mkdir /usr/local/insect-$INSECT_VERSION && \
+      cd /usr/local/insect-$INSECT_VERSION && \
+      npm install insect@$INSECT_VERSION && \
+      echo "#!/bin/bash\ncat \"\$1\" | /usr/local/insect-$INSECT_VERSION/node_modules/.bin/insect" > /usr/local/insect-$INSECT_VERSION/insect && \
+      chmod +x /usr/local/insect-$INSECT_VERSION/insect; \
+    done
+
+# RUN set -xe && \
+#     apt-get update && \
+#     apt-get install -y --no-install-recommends nodejs npm && \
+#     rm -rf /var/lib/apt/lists/*
+
+# Python for ML
+RUN apt-get update && \
+    apt-get install -y python3 python3-pip && \
+    pip3 install \
+        mlxtend \
+        numpy \
+        pandas \
+        scikit-learn \
+        pytest \
+        scipy && \
+    rm -rf /var/lib/apt/lists/*
 
 RUN set -xe && \
     apt-get update && \
